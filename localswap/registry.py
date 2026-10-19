@@ -54,8 +54,9 @@ def _video_status() -> dict:
         missing = []
     return {"ok": not missing, "backend": backend, "missing": missing,
             "tier": "heavy",
-            "note": "iGPU lane: minutes per second of video at modest res; "
-                    "route long-form to discrete CUDA"}
+            "note": "~23s per second of video at defaults on a Core Ultra "
+                    "iGPU (LTX-Video int8, measured 2026-10); long-form/"
+                    "hi-res → discrete CUDA"}
 
 
 CAPABILITIES = {

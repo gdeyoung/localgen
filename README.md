@@ -34,8 +34,10 @@ not wired — use CUDA-native stacks (diffusers + torch cuda, ComfyUI);
 transcription does use CUDA via faster-whisper when present. On Apple Silicon,
 none of this is verified — MLX/whisper.cpp are the native options there.
 
-**Video is the heavy tier.** On iGPU expect minutes per second of video at
-modest resolutions — a draft/B-roll lane, honestly labeled. Long-form and
+**Video is the heavy tier.** Measured on a Core Ultra (Lunar Lake) iGPU with
+LTX-Video int8: **~23 s of compute per second of 768×448 video** at library
+defaults (61-frame request → 57 frames; LTX snaps frame counts to 8n+1).
+CPU fallback is ~12× slower. Good for drafts and B-roll; long-form and
 high-resolution video belong on discrete CUDA hardware. `registry.plan()`
 reports `video` with `"tier": "heavy"` so an agent can route accordingly.
 
