@@ -40,8 +40,27 @@ def _stt_status() -> dict:
                 "missing": ["faster-whisper (pip install faster-whisper)"]}
 
 
+def _video_status() -> dict:
+    backends = doctor.probe()
+    backend = backends["backends"]["image"]      # same OpenVINO substrate
+    home = os.environ.get("LOCALSWAP_HOME", os.path.expanduser("~/.localswap"))
+    model = os.environ.get("LOCALSWAP_VIDEO_MODEL",
+                           os.path.join(home, "models", "video", "ltx-video-int8"))
+    if backend is None:
+        missing = ["openvino (pip install openvino openvino-genai)"]
+    elif not os.path.isdir(model):
+        missing = [f"video model dir: {model} (run scripts/export-ltx.sh)"]
+    else:
+        missing = []
+    return {"ok": not missing, "backend": backend, "missing": missing,
+            "tier": "heavy",
+            "note": "iGPU lane: minutes per second of video at modest res; "
+                    "route long-form to discrete CUDA"}
+
+
 CAPABILITIES = {
     "image": _image_status,
+    "video": _video_status,
     "tts": _tts_status,
     "transcribe": _stt_status,
 }

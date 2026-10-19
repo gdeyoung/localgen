@@ -4,16 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "localswap"
-version = "0.1.0"
-description = "Swap cloud media generation for local device compute: images (OpenVINO), cloned-voice TTS (Breeze), transcription (Whisper) — device-adaptive."
+version = "0.2.0"
+description = "Swap cloud media generation for local device compute: images + video (OpenVINO GenAI), cloned-voice TTS (Breeze), transcription (Whisper) — device-adaptive."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-keywords = ["ai", "local", "openvino", "tts", "image-generation", "voice-cloning", "agents"]
+keywords = ["ai", "local", "openvino", "tts", "image-generation", "video-generation", "voice-cloning", "agents"]
 dependencies = ["Pillow>=10"]
 
 [project.optional-dependencies]
 image = ["openvino>=2024.3", "openvino-genai>=2024.3", "numpy"]
+video = ["openvino>=2026.1", "openvino-genai>=2026.1", "numpy"]
 stt = ["faster-whisper>=1.0"]
 dev = ["pytest"]
 

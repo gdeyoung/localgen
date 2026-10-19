@@ -15,20 +15,29 @@ registry.plan()          # what THIS device can do, and exactly what's missing
 from localswap.image_local import generate
 generate("a red bicycle on mars", "out.png")          # OpenVINO, auto device
 
+from localswap.video_local import generate_video      # LTX-Video, iGPU lane
+generate_video("a red bicycle rolling across mars", "clip.mp4",
+               width=768, height=448, num_frames=61)  # ~2.4 s clip, seeded
+
 from localswap.tts_local import narrate               # YOUR reference voice
 narrate(script, "vo.wav", ref_wav="me.wav", ref_text="verbatim transcript of me.wav")
 ```
 
-CLI: `localswap doctor` · `localswap plan` · `localswap image "prompt" out.png` · `localswap tts ...`
+CLI: `localswap doctor` · `localswap plan` · `localswap image "prompt" out.png` · `localswap video "prompt" clip.mp4` · `localswap tts ...`
 
 ## Scope boundary (read this first)
 
 **Verified on:** Intel Core Ultra (Lunar Lake) iGPU + CPU, Linux, ffmpeg 9,
-openvino-genai 2026.x, Breeze-TTS-2.cpp current release. Image generation is
-**Intel-only** (OpenVINO). On NVIDIA, image generation is not wired — use
-CUDA-native stacks (diffusers + torch cuda, ComfyUI); transcription does use
-CUDA via faster-whisper when present. On Apple Silicon, none of this is
-verified — MLX/whisper.cpp are the native options there.
+openvino-genai 2026.x, Breeze-TTS-2.cpp current release. Image and **video**
+generation are **Intel-only** (OpenVINO). On NVIDIA, image/video generation is
+not wired — use CUDA-native stacks (diffusers + torch cuda, ComfyUI);
+transcription does use CUDA via faster-whisper when present. On Apple Silicon,
+none of this is verified — MLX/whisper.cpp are the native options there.
+
+**Video is the heavy tier.** On iGPU expect minutes per second of video at
+modest resolutions — a draft/B-roll lane, honestly labeled. Long-form and
+high-resolution video belong on discrete CUDA hardware. `registry.plan()`
+reports `video` with `"tier": "heavy"` so an agent can route accordingly.
 
 No model weights are bundled or downloaded by this library. You fetch models
 from their upstream releases (see ATTRIBUTION.md for the projects); localswap
@@ -42,6 +51,10 @@ pip install "localswap[image]"   # + OpenVINO image generation
 localswap doctor                 # what this machine has
 localswap plan                   # gaps named, as a checklist
 ```
+
+Video (LTX-Video int8, ~6 GB export): `pip install "localswap[video]"` then
+`bash scripts/export-ltx.sh` (converts from Hugging Face; optimum-intel +
+nncf installed on demand).
 
 TTS needs the Breeze CLI built once: `bash scripts/build-breeze.sh` (fetches
 upstream source tarballs, vendored Vulkan headers only if your system lacks

@@ -11,6 +11,7 @@ time.
 | OpenVINO / OpenVINO GenAI | https://github.com/openvinotoolkit/openvino.genai | Apache-2.0 | Image generation backend (`image_local.py`) |
 | LCM DreamShaper (int8) | Hugging Face model card (Lykon/dreamshaper-8, LCM LoRA variant) | see model card | Verified few-step image model; referenced, not bundled |
 | faster-whisper | https://github.com/SYSTRAN/faster-whisper | MIT | Transcription backend adapter |
+| LTX-Video | https://huggingface.co/Lightricks/LTX-Video (Lightricks) | see model card | Video generation backend; `scripts/export-ltx.sh` produces the int8 OpenVINO export `video_local.py` wraps (flag surface verified against openvino-genai 2026.4 docs, 2026-10) |
 | Vulkan-Headers | https://github.com/KhronosGroup/Vulkan-Headers | Apache-2.0/MIT | Vendored at build time only when system headers are absent |
 
 Operational knowledge (chunk sizing, seed scheme, edge-trim, mastering chain)
