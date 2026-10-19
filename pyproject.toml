@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "localswap"
-version = "0.2.0"
-description = "Swap cloud media generation for local device compute: images + video (OpenVINO GenAI), cloned-voice TTS (Breeze), transcription (Whisper) — device-adaptive."
+version = "0.3.0"
+description = "Swap cloud media generation for local device compute: images + video (OpenVINO GenAI), neural upscale + frame interpolation (ncnn/Vulkan), cloned-voice TTS (Breeze), transcription (Whisper) — device-adaptive."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

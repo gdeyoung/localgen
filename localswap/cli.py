@@ -34,6 +34,18 @@ def main(argv: list[str] | None = None) -> int:
     p_vid.add_argument("--device", default="auto")
     p_vid.add_argument("--negative", default=None)
 
+    p_up = sub.add_parser("upscale", help="neural 2x/3x/4x upscale of a video or image")
+    p_up.add_argument("in_path")
+    p_up.add_argument("out_path", nargs="?", default=None)
+    p_up.add_argument("--factor", type=int, default=2, choices=[2, 3, 4])
+    p_up.add_argument("--model", default="realesr-animevideov3")
+
+    p_in = sub.add_parser("interp", help="RIFE frame interpolation (raise fps)")
+    p_in.add_argument("in_path")
+    p_in.add_argument("out_path", nargs="?", default=None)
+    p_in.add_argument("--mult", type=float, default=2)
+    p_in.add_argument("--model", default="rife-v4.6")
+
     p_tts = sub.add_parser("tts", help="narrate text in a cloned voice (your reference)")
     p_tts.add_argument("text")
     p_tts.add_argument("out", nargs="?", default="narration.wav")
@@ -65,6 +77,18 @@ def main(argv: list[str] | None = None) -> int:
                                         steps=a.steps, seed=a.seed, fps=a.fps,
                                         device=a.device,
                                         negative_prompt=a.negative), indent=2))
+        return 0
+    if a.cmd == "upscale":
+        from .enhance_local import upscale
+        out_path = a.out_path or (a.in_path.rsplit(".", 1)[0] + f"_{a.factor}x.mp4")
+        print(json.dumps(upscale(a.in_path, out_path, factor=a.factor,
+                                 model=a.model), indent=2))
+        return 0
+    if a.cmd == "interp":
+        from .enhance_local import interpolate
+        out_path = a.out_path or (a.in_path.rsplit(".", 1)[0] + f"_{int(a.mult)}x.mp4")
+        print(json.dumps(interpolate(a.in_path, out_path, mult=a.mult,
+                                     model=a.model), indent=2))
         return 0
     if a.cmd == "tts":
         from .tts_local import narrate

@@ -18,6 +18,7 @@ generate("a red bicycle on mars", "out.png")          # OpenVINO, auto device
 from localswap.video_local import generate_video      # LTX-Video, iGPU lane
 generate_video("a red bicycle rolling across mars", "clip.mp4",
                width=768, height=448, num_frames=61)  # ~2.4 s clip, seeded
+generate_video("...", "clip.mp4", finish="smooth2x")  # + RIFE 2x fps + 2x upscale
 
 from localswap.tts_local import narrate               # YOUR reference voice
 narrate(script, "vo.wav", ref_wav="me.wav", ref_text="verbatim transcript of me.wav")
@@ -40,6 +41,15 @@ defaults (61-frame request → 57 frames; LTX snaps frame counts to 8n+1).
 CPU fallback is ~12× slower. Good for drafts and B-roll; long-form and
 high-resolution video belong on discrete CUDA hardware. `registry.plan()`
 reports `video` with `"tier": "heavy"` so an agent can route accordingly.
+
+**The finish pipeline (generate → interpolate → upscale).** Neural upscale
+(Real-ESRGAN ncnn, Vulkan) and frame interpolation (RIFE ncnn, Vulkan) are
+built in — `finish="smooth2x"` on `generate_video`, or standalone
+`enhance_local.upscale()` / `.interpolate()` / CLI `localswap upscale|interp`.
+Measured on the same iGPU: 2× fps ≈ 3.5 s per 57-frame clip, 2× upscale ≈ 0.33 s
+per frame. One call turns the raw 768×448@25 clip into 1536×896@50 in ~101 s
+total. Binaries are BYO from their GitHub releases into `$LOCALSWAP_HOME/tools`
+(see `enhance_local.py` docstring); no weights bundled.
 
 No model weights are bundled or downloaded by this library. You fetch models
 from their upstream releases (see ATTRIBUTION.md for the projects); localswap

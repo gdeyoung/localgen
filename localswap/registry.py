@@ -59,9 +59,27 @@ def _video_status() -> dict:
                     "hi-res → discrete CUDA"}
 
 
+def _enhance_status() -> dict:
+    from . import enhance_local
+    backends = doctor.probe()
+    missing = []
+    if not backends["vulkan"]:
+        missing.append("vulkan runtime (ncnn binaries need it; iGPU lane "
+                       "needs intel-compute-runtime + level-zero-loader too)")
+    if not os.path.isfile(enhance_local.realesrgan_bin()):
+        missing.append(f"realesrgan-ncnn-vulkan: {enhance_local.realesrgan_bin()}")
+    if not os.path.isfile(enhance_local.rife_bin()):
+        missing.append(f"rife-ncnn-vulkan: {enhance_local.rife_bin()}")
+    return {"ok": not missing and backends["ffmpeg"],
+            "backend": "ncnn-vulkan" if not missing else None, "missing": missing,
+            "note": "2x upscale (realesr-animevideov3) ~16s per 2.3s clip; "
+                    "RIFE 2x fps (rife-v4.6); measured 140V iGPU 2026-10"}
+
+
 CAPABILITIES = {
     "image": _image_status,
     "video": _video_status,
+    "enhance": _enhance_status,
     "tts": _tts_status,
     "transcribe": _stt_status,
 }

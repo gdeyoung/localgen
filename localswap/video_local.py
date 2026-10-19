@@ -93,10 +93,14 @@ def generate_video(prompt: str, out: str = "out.mp4", *, width: int = 768,
                    height: int = 448, num_frames: int = 61, steps: int = 20,
                    seed: int = 42, fps: int = 25, device: str = "auto",
                    model: str | None = None, guidance_scale: float = 3.0,
-                   negative_prompt: str | None = None) -> dict:
+                   negative_prompt: str | None = None,
+                   finish: str | None = None) -> dict:
     """Text-to-video on this device's Intel silicon. Returns timing + paths.
 
-    LTX snaps num_frames down to the nearest 8n+1 (61 -> 57)."""
+    LTX snaps num_frames down to the nearest 8n+1 (61 -> 57).
+
+    finish=None (raw) | "upscale2x" (2x Real-ESRGAN) | "smooth2x"
+    (RIFE 2x fps -> 2x upscale; the production pattern)."""
     model_dir = _resolve_model(model)
     if not os.path.isdir(model_dir):
         raise FileNotFoundError(
@@ -124,15 +128,27 @@ def generate_video(prompt: str, out: str = "out.mp4", *, width: int = 768,
     frames = stack[0]
     encode_s = _encode(frames, out, width, height, fps)
     wav = _save_audio(result, out)
-    return {"out": os.path.abspath(out), "audio": wav, "device": dev,
-            "frames": int(frames.shape[0]), "fps": fps,
-            "seconds": round(frames.shape[0] / fps, 2),
-            "resolution": f"{width}x{height}", "steps": steps, "seed": seed,
-            "compile_s": round(t1 - t0, 1), "generate_s": round(t2 - t1, 1),
-            "encode_s": round(encode_s, 1),
-            "note": "iGPU lane: ~23s per second of video at defaults on a "
-                    "Core Ultra iGPU (CPU fallback ~12x slower); route "
-                    "long-form/hi-res to discrete CUDA"}
+    res = {"out": os.path.abspath(out), "audio": wav, "device": dev,
+           "frames": int(frames.shape[0]), "fps": fps,
+           "seconds": round(frames.shape[0] / fps, 2),
+           "resolution": f"{width}x{height}", "steps": steps, "seed": seed,
+           "compile_s": round(t1 - t0, 1), "generate_s": round(t2 - t1, 1),
+           "encode_s": round(encode_s, 1)}
+    if finish is not None:
+        if finish not in ("upscale2x", "smooth2x"):
+            raise ValueError("finish must be None | 'upscale2x' | 'smooth2x'")
+        from .enhance_local import interpolate, upscale
+        stem = out.rsplit(".", 1)[0]
+        if finish == "smooth2x":
+            res["interp"] = interpolate(out, stem + "_50fps.mp4", mult=2)
+            out = stem + "_50fps.mp4"
+        res["upscale"] = upscale(out, stem + "_2x.mp4", factor=2)
+        res["out"] = res["upscale"]["out"]
+        res["finish"] = finish
+    res["note"] = ("iGPU lane: ~23s per second of video at defaults on a "
+                   "Core Ultra iGPU (CPU fallback ~12x slower); route "
+                   "long-form/hi-res to discrete CUDA")
+    return res
 
 
 def image_to_video(prompt: str, image: str, out: str = "out_i2v.mp4", *,
