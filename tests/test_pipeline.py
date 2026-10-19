@@ -1,7 +1,7 @@
 import unittest
 
-from localswap.tts_local import MASTER_FILTER, TRIM_FILTER, chunk_script, seeds_for
-from localswap.registry import plan
+from localgen.tts_local import MASTER_FILTER, TRIM_FILTER, chunk_script, seeds_for
+from localgen.registry import plan
 
 
 class Chunking(unittest.TestCase):

@@ -1,4 +1,4 @@
-"""Device probe: what accelerators does this machine have, and what can localswap use?
+"""Device probe: what accelerators does this machine have, and what can localgen use?
 
 Providers are expected to call probe() once and pick their backend from the
 result. Everything is a plain dict — JSON-serializable for agent consumption.
@@ -38,7 +38,7 @@ def _has_cuda() -> bool:
 
 
 def probe() -> dict:
-    """Return a device report: accelerators found + localswap backends they enable."""
+    """Return a device report: accelerators found + localgen backends they enable."""
     ov_devices = _openvino_devices()
     vulkan = _has_vulkan()
     cuda = _has_cuda()

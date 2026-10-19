@@ -11,8 +11,8 @@ Binaries are BYO (~50MB each, no weights bundled):
                             (github.com/xinntao/Real-ESRGAN release v0.2.5.0)
   rife-ncnn-vulkan        <- rife-ncnn-vulkan-20221029-ubuntu.zip
                             (github.com/nihui/rife-ncnn-vulkan)
-Default home: $LOCALSWAP_HOME/tools/ ; overrides LOCALSWAP_REALESRGAN_BIN /
-LOCALSWAP_RIFE_BIN. Verified on Vulkan iGPU 2026-10: 2x upscale of a 57-frame
+Default home: $LOCALGEN_HOME/tools/ ; overrides LOCALGEN_REALESRGAN_BIN /
+LOCALGEN_RIFE_BIN. Verified on Vulkan iGPU 2026-10: 2x upscale of a 57-frame
 768x448 clip in ~16s; model dirs ship inside each zip.
 """
 from __future__ import annotations
@@ -25,19 +25,19 @@ import time
 
 
 def _tools_home() -> str:
-    home = os.environ.get("LOCALSWAP_HOME", os.path.expanduser("~/.localswap"))
+    home = os.environ.get("LOCALGEN_HOME", os.path.expanduser("~/.localgen"))
     return os.path.join(home, "tools")
 
 
 def realesrgan_bin() -> str:
-    env = os.environ.get("LOCALSWAP_REALESRGAN_BIN")
+    env = os.environ.get("LOCALGEN_REALESRGAN_BIN")
     if env:
         return env
     return os.path.join(_tools_home(), "realesrgan-ncnn-vulkan")
 
 
 def rife_bin() -> str:
-    env = os.environ.get("LOCALSWAP_RIFE_BIN")
+    env = os.environ.get("LOCALGEN_RIFE_BIN")
     if env:
         return env
     return os.path.join(_tools_home(), "rife-ncnn-vulkan-20221029-ubuntu",
@@ -118,7 +118,7 @@ def upscale(in_path: str, out_path: str, *, factor: int = 2,
     if not os.path.isfile(binpath):
         raise FileNotFoundError(
             f"realesrgan-ncnn-vulkan not found: {binpath} — fetch the ubuntu "
-            f"zip from the Real-ESRGAN v0.2.5.0 release into $LOCALSWAP_HOME/tools/")
+            f"zip from the Real-ESRGAN v0.2.5.0 release into $LOCALGEN_HOME/tools/")
     t0 = time.time()
     if _is_image(in_path):
         subprocess.run(_rsg_cmd(binpath, os.path.abspath(in_path),
@@ -127,7 +127,7 @@ def upscale(in_path: str, out_path: str, *, factor: int = 2,
         return {"out": os.path.abspath(out_path), "factor": factor, "model": model,
                 "took_s": round(time.time() - t0, 1)}
     info = probe_video(in_path)
-    with tempfile.TemporaryDirectory(prefix="localswap-up-") as work:
+    with tempfile.TemporaryDirectory(prefix="localgen-up-") as work:
         src, dst = os.path.join(work, "in"), os.path.join(work, "out")
         os.makedirs(src), os.makedirs(dst)
         _extract(in_path, work)
@@ -148,11 +148,11 @@ def interpolate(in_path: str, out_path: str, *, mult: float = 2,
     if not os.path.isfile(binpath):
         raise FileNotFoundError(
             f"rife-ncnn-vulkan not found: {binpath} — fetch the ubuntu zip "
-            f"from the nihui/rife-ncnn-vulkan 20221029 release into $LOCALSWAP_HOME/tools/")
+            f"from the nihui/rife-ncnn-vulkan 20221029 release into $LOCALGEN_HOME/tools/")
     t0 = time.time()
     info = probe_video(in_path)
     n_target = max(2, round(info["frames"] * mult))
-    with tempfile.TemporaryDirectory(prefix="localswap-rife-") as work:
+    with tempfile.TemporaryDirectory(prefix="localgen-rife-") as work:
         src, dst = os.path.join(work, "in"), os.path.join(work, "out")
         os.makedirs(src), os.makedirs(dst)
         _extract(in_path, work)

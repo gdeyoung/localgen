@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "localswap"
+name = "localgen"
 version = "0.3.0"
 description = "Swap cloud media generation for local device compute: images + video (OpenVINO GenAI), neural upscale + frame interpolation (ncnn/Vulkan), cloned-voice TTS (Breeze), transcription (Whisper) — device-adaptive."
 readme = "README.md"
@@ -19,7 +19,7 @@ stt = ["faster-whisper>=1.0"]
 dev = ["pytest"]
 
 [project.scripts]
-localswap = "localswap.cli:main"
+localgen = "localgen.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["localswap*"]
+include = ["localgen*"]

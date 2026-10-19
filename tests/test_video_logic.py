@@ -3,7 +3,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from localswap.video_local import _ffmpeg_cmd, _resolve_model
+from localgen.video_local import _ffmpeg_cmd, _resolve_model
 
 
 class TestVideoLogic(unittest.TestCase):
@@ -24,17 +24,17 @@ class TestVideoLogic(unittest.TestCase):
         self.assertIn("-y", _ffmpeg_cmd("o.mp4", 64, 64, 24))
 
     def test_resolve_model_env_override(self):
-        with patch.dict(os.environ, {"LOCALSWAP_VIDEO_MODEL": "/custom/ltx"}):
+        with patch.dict(os.environ, {"LOCALGEN_VIDEO_MODEL": "/custom/ltx"}):
             self.assertEqual(_resolve_model(None), "/custom/ltx")
         # explicit arg wins over env
-        with patch.dict(os.environ, {"LOCALSWAP_VIDEO_MODEL": "/custom/ltx"}):
+        with patch.dict(os.environ, {"LOCALGEN_VIDEO_MODEL": "/custom/ltx"}):
             self.assertEqual(_resolve_model("/explicit"), "/explicit")
 
     def test_resolve_model_default_path(self):
         env = {k: v for k, v in os.environ.items()
-               if k not in ("LOCALSWAP_VIDEO_MODEL", "LOCALSWAP_HOME")}
+               if k not in ("LOCALGEN_VIDEO_MODEL", "LOCALGEN_HOME")}
         with patch.dict(os.environ, env, clear=True):
-            expected = os.path.join(os.path.expanduser("~/.localswap"),
+            expected = os.path.join(os.path.expanduser("~/.localgen"),
                                     "models", "video", "ltx-video-int8")
             self.assertEqual(_resolve_model(None), expected)
 

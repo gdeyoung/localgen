@@ -24,7 +24,7 @@ enhancement backfills smoothness and detail for a fraction of the cost.
 On the laptop this whole pattern is one call:
 
 ```python
-from localswap.video_local import generate_video
+from localgen.video_local import generate_video
 r = generate_video("prompt", "clip.mp4", finish="smooth2x")   # gen + RIFE + 2x upscale
 ```
 
@@ -41,21 +41,21 @@ python3 -c "import openvino as ov; print(ov.Core().available_devices)"  # expect
 # 2. ffmpeg + a venv with the runtime deps
 sudo pacman -S ffmpeg
 python3 -m venv ~/venvs/media && ~/venvs/media/bin/pip install \
-  "localswap[image,video]"   # openvino + openvino-genai + numpy
+  "localgen[image,video]"   # openvino + openvino-genai + numpy
 
 # 3. Models are BYO (nothing ships in the repo):
 ~/venvs/media/bin/python -m pip install 'optimum-intel==2.2.0' 'nncf>=3.4' \
   'transformers==4.57.6' 'diffusers==0.39.0' 'huggingface-hub<1.22' \
   tiktoken sentencepiece protobuf
-bash scripts/export-ltx.sh          # LTX-Video int8 -> ~/.localswap (≈6.7 GB)
+bash scripts/export-ltx.sh          # LTX-Video int8 -> ~/.localgen (≈6.7 GB)
 
 # 4. Enhancement binaries (BYO, ~50 MB each):
 #    realesrgan-ncnn-vulkan  <- github.com/xinntao/Real-ESRGAN v0.2.5.0 ubuntu zip
 #    rife-ncnn-vulkan        <- github.com/nihui/rife-ncnn-vulkan 20221029 ubuntu zip
-#    (realesrgan zip extracts FLAT into ~/.localswap/tools/; rife keeps its dir)
+#    (realesrgan zip extracts FLAT into ~/.localgen/tools/; rife keeps its dir)
 
 # 5. Verify — never promise without this
-localswap doctor && localswap plan   # every capability green or gap-named
+localgen doctor && localgen plan   # every capability green or gap-named
 ```
 
 Notes baked into the tooling (do not relearn them):
@@ -67,14 +67,14 @@ Notes baked into the tooling (do not relearn them):
 
 ## 3. Daily workflow
 
-1. **Probe**: `localswap doctor` (accelerators) / `localswap plan`
+1. **Probe**: `localgen doctor` (accelerators) / `localgen plan`
    (capabilities + exact gaps). Per-environment truth — a venv without
    openvino reports no video backend even on a capable machine.
 2. **Generate**:
-   - images: `localswap image "prompt" out.png` (LCM 4-step, seeded)
-   - video: `localswap video "prompt" clip.mp4` — raw output
+   - images: `localgen image "prompt" out.png` (LCM 4-step, seeded)
+   - video: `localgen video "prompt" clip.mp4` — raw output
    - video, finished: `finish="smooth2x"` → 2× fps + 2× upscale
-   - voice: `localswap tts` with YOUR reference wav + verbatim transcript
+   - voice: `localgen tts` with YOUR reference wav + verbatim transcript
    - transcribe: faster-whisper adapter
 3. **Everything is seeded.** Same prompt + same seed → same bytes. Reruns are
    free; A/B is one seed apart.
@@ -104,7 +104,7 @@ work than the reverse.
   `build-breeze.sh`, the two ncnn zip URLs). A fresh device stands up from
   §2 with zero private data.
 - **Whole-home time-machine** (rsync snapshots, 09:20/21:20) covers
-  `~/.localswap` — model + tools ride along at hardlink cost (7.2 GB once,
+  `~/.localgen` — model + tools ride along at hardlink cost (7.2 GB once,
   ~0 after). The HuggingFace cache (27 GB) is deliberately excluded:
   re-downloadable bulk.
 - No secrets, keys, or personal voice references live in this repo — BYO

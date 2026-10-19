@@ -1,4 +1,4 @@
-"""localswap CLI: doctor | plan | image | video | tts"""
+"""localgen CLI: doctor | plan | image | video | tts"""
 from __future__ import annotations
 
 import argparse
@@ -7,7 +7,7 @@ import sys
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="localswap", description=__doc__)
+    ap = argparse.ArgumentParser(prog="localgen", description=__doc__)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("doctor", help="probe accelerators + backends (JSON)")

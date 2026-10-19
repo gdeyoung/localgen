@@ -5,7 +5,7 @@
 # from upstream releases yourself and place it beside the binary.
 set -euo pipefail
 
-DEST="${1:-${LOCALSWAP_HOME:-$HOME/.localswap}/breeze}"
+DEST="${1:-${LOCALGEN_HOME:-$HOME/.localgen}/breeze}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$WORK"

@@ -4,7 +4,7 @@ Works with any converted SD-family model directory (e.g. LCM Dreamshaper int8,
 diffusers format exported for OpenVINO). Verify your model supports few-step
 LCM sampling before lowering --steps below 8.
 
-Paths: LOCALSWAP_IMAGE_MODEL (model dir). Default: $LOCALSWAP_HOME/models/image.
+Paths: LOCALGEN_IMAGE_MODEL (model dir). Default: $LOCALGEN_HOME/models/image.
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ import time
 def _resolve_model(model: str | None) -> str:
     if model:
         return os.path.expanduser(model)
-    home = os.environ.get("LOCALSWAP_HOME", os.path.expanduser("~/.localswap"))
+    home = os.environ.get("LOCALGEN_HOME", os.path.expanduser("~/.localgen"))
     return os.path.join(home, "models", "image")
 
 
@@ -37,7 +37,7 @@ def generate(prompt: str, out: str = "out.png", *, width: int = 768, height: int
     model_dir = _resolve_model(model)
     if not os.path.isdir(model_dir):
         raise FileNotFoundError(
-            f"model dir not found: {model_dir} — set LOCALSWAP_IMAGE_MODEL or pass model="
+            f"model dir not found: {model_dir} — set LOCALGEN_IMAGE_MODEL or pass model="
         )
     import openvino as ov
 

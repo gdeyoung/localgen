@@ -1,7 +1,7 @@
 """Enhance module logic tests — no binaries, no GPU, no ffmpeg."""
 import unittest
 
-from localswap.enhance_local import (_fps_of, _renumber, _rife_cmd,
+from localgen.enhance_local import (_fps_of, _renumber, _rife_cmd,
                                      _rsg_cmd)
 
 

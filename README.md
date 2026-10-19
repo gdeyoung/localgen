@@ -1,4 +1,4 @@
-# localswap
+# localgen
 
 Swap cloud media-generation services for **whatever compute your device already has**.
 
@@ -9,22 +9,22 @@ through whatever backend that device can run. Built so AI agents (Hermes,
 Claude Code, any coding agent) can generate media locally with one import.
 
 ```python
-from localswap import registry
+from localgen import registry
 registry.plan()          # what THIS device can do, and exactly what's missing
 
-from localswap.image_local import generate
+from localgen.image_local import generate
 generate("a red bicycle on mars", "out.png")          # OpenVINO, auto device
 
-from localswap.video_local import generate_video      # LTX-Video, iGPU lane
+from localgen.video_local import generate_video      # LTX-Video, iGPU lane
 generate_video("a red bicycle rolling across mars", "clip.mp4",
                width=768, height=448, num_frames=61)  # ~2.4 s clip, seeded
 generate_video("...", "clip.mp4", finish="smooth2x")  # + RIFE 2x fps + 2x upscale
 
-from localswap.tts_local import narrate               # YOUR reference voice
+from localgen.tts_local import narrate               # YOUR reference voice
 narrate(script, "vo.wav", ref_wav="me.wav", ref_text="verbatim transcript of me.wav")
 ```
 
-CLI: `localswap doctor` · `localswap plan` · `localswap image "prompt" out.png` · `localswap video "prompt" clip.mp4` · `localswap tts ...`
+CLI: `localgen doctor` · `localgen plan` · `localgen image "prompt" out.png` · `localgen video "prompt" clip.mp4` · `localgen tts ...`
 
 ## Scope boundary (read this first)
 
@@ -45,26 +45,26 @@ reports `video` with `"tier": "heavy"` so an agent can route accordingly.
 **The finish pipeline (generate → interpolate → upscale).** Neural upscale
 (Real-ESRGAN ncnn, Vulkan) and frame interpolation (RIFE ncnn, Vulkan) are
 built in — `finish="smooth2x"` on `generate_video`, or standalone
-`enhance_local.upscale()` / `.interpolate()` / CLI `localswap upscale|interp`.
+`enhance_local.upscale()` / `.interpolate()` / CLI `localgen upscale|interp`.
 Measured on the same iGPU: 2× fps ≈ 3.5 s per 57-frame clip, 2× upscale ≈ 0.33 s
 per frame. One call turns the raw 768×448@25 clip into 1536×896@50 in ~101 s
-total. Binaries are BYO from their GitHub releases into `$LOCALSWAP_HOME/tools`
+total. Binaries are BYO from their GitHub releases into `$LOCALGEN_HOME/tools`
 (see `enhance_local.py` docstring); no weights bundled.
 
 No model weights are bundled or downloaded by this library. You fetch models
-from their upstream releases (see ATTRIBUTION.md for the projects); localswap
-finds them under `$LOCALSWAP_HOME` (default `~/.localswap`) or env overrides.
+from their upstream releases (see ATTRIBUTION.md for the projects); localgen
+finds them under `$LOCALGEN_HOME` (default `~/.localgen`) or env overrides.
 
 ## Install
 
 ```bash
-pip install localswap            # or: pip install -e . from a checkout
-pip install "localswap[image]"   # + OpenVINO image generation
-localswap doctor                 # what this machine has
-localswap plan                   # gaps named, as a checklist
+pip install localgen            # or: pip install -e . from a checkout
+pip install "localgen[image]"   # + OpenVINO image generation
+localgen doctor                 # what this machine has
+localgen plan                   # gaps named, as a checklist
 ```
 
-Video (LTX-Video int8, ~6 GB export): `pip install "localswap[video]"` then
+Video (LTX-Video int8, ~6 GB export): `pip install "localgen[video]"` then
 `bash scripts/export-ltx.sh` (converts from Hugging Face; optimum-intel +
 nncf installed on demand).
 

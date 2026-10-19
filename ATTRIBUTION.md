@@ -1,6 +1,6 @@
 # Attribution
 
-localswap is original code (MIT). It builds on, calls, or is informed by these
+localgen is original code (MIT). It builds on, calls, or is informed by these
 upstream projects. **No upstream source code or model weights are
 redistributed in this repository** — scripts fetch them from upstream at build
 time.

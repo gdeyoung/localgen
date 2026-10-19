@@ -2,10 +2,10 @@
 
 You supply the voice: a reference WAV + its verbatim transcript. Nothing
 personal ships with this library. Build the CLI once with
-scripts/build-breeze.sh, point LOCALSWAP_BREEZE_CLI / LOCALSWAP_BREEZE_MODEL
-at it (defaults under $LOCALSWAP_HOME/breeze/), and narrate:
+scripts/build-breeze.sh, point LOCALGEN_BREEZE_CLI / LOCALGEN_BREEZE_MODEL
+at it (defaults under $LOCALGEN_HOME/breeze/), and narrate:
 
-    from localswap.tts_local import narrate
+    from localgen.tts_local import narrate
     narrate("Long script...", "out.wav", ref_wav="me.wav", ref_text="...")
 
 Pipeline per chunk (VERIFIED against breeze-cli flag surface): deterministic
@@ -67,9 +67,9 @@ def narrate(text: str, out: str, *, ref_wav: str, ref_text: str,
             workdir: str | None = None, cli: str | None = None,
             model: str | None = None) -> dict:
     """Synthesize `text` in the cloned voice. Returns file + duration + chunk count."""
-    home = Path(os.environ.get("LOCALSWAP_HOME", os.path.expanduser("~/.localswap")))
-    cli = cli or os.environ.get("LOCALSWAP_BREEZE_CLI", str(home / "breeze" / "breeze-cli"))
-    model = model or os.environ.get("LOCALSWAP_BREEZE_MODEL", str(home / "breeze" / "breeze-tts-2-q8_0.gguf"))
+    home = Path(os.environ.get("LOCALGEN_HOME", os.path.expanduser("~/.localgen")))
+    cli = cli or os.environ.get("LOCALGEN_BREEZE_CLI", str(home / "breeze" / "breeze-cli"))
+    model = model or os.environ.get("LOCALGEN_BREEZE_MODEL", str(home / "breeze" / "breeze-tts-2-q8_0.gguf"))
     for p, label in ((cli, "breeze-cli"), (model, "breeze model"), (ref_wav, "ref_wav")):
         if not os.path.exists(os.path.expanduser(p)):
             raise FileNotFoundError(f"{label} not found: {p}")

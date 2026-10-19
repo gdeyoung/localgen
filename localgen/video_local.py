@@ -11,8 +11,8 @@ LTX-2/LTX-2.3 exports additionally generate a synchronized audio track;
 if present it is written alongside and muxed in (audio path exercised only
 on LTX-Video, which has none).
 
-Paths: LOCALSWAP_VIDEO_MODEL (model dir). Default:
-$LOCALSWAP_HOME/models/video/ltx-video-int8.
+Paths: LOCALGEN_VIDEO_MODEL (model dir). Default:
+$LOCALGEN_HOME/models/video/ltx-video-int8.
 """
 from __future__ import annotations
 
@@ -24,10 +24,10 @@ import time
 def _resolve_model(model: str | None) -> str:
     if model:
         return os.path.expanduser(model)
-    env = os.environ.get("LOCALSWAP_VIDEO_MODEL")
+    env = os.environ.get("LOCALGEN_VIDEO_MODEL")
     if env:
         return env
-    home = os.environ.get("LOCALSWAP_HOME", os.path.expanduser("~/.localswap"))
+    home = os.environ.get("LOCALGEN_HOME", os.path.expanduser("~/.localgen"))
     return os.path.join(home, "models", "video", "ltx-video-int8")
 
 
@@ -105,7 +105,7 @@ def generate_video(prompt: str, out: str = "out.mp4", *, width: int = 768,
     if not os.path.isdir(model_dir):
         raise FileNotFoundError(
             f"model dir not found: {model_dir} — run scripts/export-ltx.sh "
-            f"or set LOCALSWAP_VIDEO_MODEL"
+            f"or set LOCALGEN_VIDEO_MODEL"
         )
     import numpy as np
     import openvino as ov
@@ -161,7 +161,7 @@ def image_to_video(prompt: str, image: str, out: str = "out_i2v.mp4", *,
     if not os.path.isdir(model_dir):
         raise FileNotFoundError(
             f"model dir not found: {model_dir} — run scripts/export-ltx.sh "
-            f"or set LOCALSWAP_VIDEO_MODEL"
+            f"or set LOCALGEN_VIDEO_MODEL"
         )
     import numpy as np
     import openvino as ov
