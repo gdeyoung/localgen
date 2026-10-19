@@ -97,3 +97,4 @@ engines (HyperFrames, OpenFilm) — generate assets locally, compose anywhere.
 
 MIT (see LICENSE). Attribution for upstream projects: ATTRIBUTION.md.
 Operator's manual (stand-up, workflow, routing, recovery): **docs/WORKFLOW.md**.
+Music generation doctrine (fleet kit distillate): **docs/music-kit.md**.
