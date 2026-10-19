@@ -17,16 +17,21 @@ PY="${LOCALSWAP_PY:-python3}"
 
 if ! "$PY" -c 'import optimum.intel, nncf' >/dev/null 2>&1; then
   echo "installing export tooling into the interpreter at: $PY" >&2
-  # Version sandwich (verified 2026-10): optimum-intel 2.2 wants
-  # transformers<5.6; diffusers>=0.40 imports Gemma4 classes that only exist
-  # in transformers>=5.6. These pins are the known-good intersection.
+  # Version sandwich (verified 2026-10): optimum-intel 2.2 is built against
+  # transformers 4.5x — on 5.x its NormalizedConfig call crashes ("got multiple
+  # values for argument 'allow_new'"). diffusers must stay <=0.39 (0.40+
+  # imports Gemma4 classes that only exist in transformers>=5.6).
   "$PY" -m pip install 'optimum-intel==2.2.0' 'nncf>=3.4' \
-    'transformers==5.5.4' 'diffusers==0.39.0' 'huggingface-hub<1.22' >&2
+    'transformers==4.57.6' 'diffusers==0.39.0' 'huggingface-hub<1.22' \
+    tiktoken sentencepiece protobuf >&2
 fi
 
-CLI="$(dirname "$(command -v "$PY")")/optimum-cli"
-[ -x "$CLI" ] || CLI="optimum-cli"
+CLI="$PY"
+DRIVER="$(dirname "$0")/optimum_py314_driver.py"
 
 mkdir -p "$(dirname "$OUT")"
-exec "$CLI" export openvino --model "$MODEL_ID" --task text-to-video \
+# Python 3.14 made functools.partial a descriptor, breaking optimum's
+# with_args class attributes — route through the shim driver always
+# (harmless on <=3.13).
+exec "$CLI" "$DRIVER" export openvino --model "$MODEL_ID" --task text-to-video \
   --weight-format int8 --trust-remote-code "$OUT"
